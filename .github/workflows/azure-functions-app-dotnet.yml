@@ -4,7 +4,6 @@ on:
   push:
     branches: [ master ]
 
-
 env:
   DOTNET_VERSION: '6.0.x'
   AZURE_RESOURCE_GROUP_NAME: 'rg-cor-sh-shpaud-pre-01'
