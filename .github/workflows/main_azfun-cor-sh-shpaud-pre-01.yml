@@ -39,4 +39,4 @@ jobs:
           app-name: 'azfun-cor-sh-shpaud-pre-01'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C0F496E6FC7D4D6A9A9BF2CEA61C3EB7 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
