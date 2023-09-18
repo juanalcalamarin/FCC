@@ -18,7 +18,7 @@ defaults:
 
 jobs:
     deploy-az-function:
-      runs-on: windows-latest
+      runs-on: ubuntu-latest
       steps:
       
        # Makes source code accessible via $github.workspace
