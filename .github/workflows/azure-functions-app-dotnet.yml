@@ -2,7 +2,7 @@ name: azure-deploy
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
   DOTNET_VERSION: '6.0.x'
