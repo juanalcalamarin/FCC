@@ -49,7 +49,7 @@ namespace FCC.AF.CargaSociedades.Application
         {
             try
             {
-                log.LogWarning("Cargamos datos de configuración");
+                log.LogInformation("Cargamos datos de configuración");
                 AZConfig cfg = new AZConfig
                 {
                     _TenantId = Environment.GetEnvironmentVariable("_TenantId", EnvironmentVariableTarget.Process),
@@ -69,10 +69,10 @@ namespace FCC.AF.CargaSociedades.Application
                 DataTable DocumentTypesDT = null;
                 DataTable SecurityGroupsDT = null;
 
-                log.LogWarning("Conectamos a la biblioteca de documentos del hub");
+                log.LogInformation("Conectamos a la biblioteca de documentos del hub");
                 using (ClientContext ctx = CreateContext(cfg, certificate, cfg._HubUrl))
                 {
-                    log.LogWarning("Contexto creado");
+                    log.LogInformation("Contexto creado");
 
                     List list = ctx.Web.Lists.GetByTitle("Documents");
                     ctx.Load(list);
@@ -84,8 +84,8 @@ namespace FCC.AF.CargaSociedades.Application
                     ctx.Load(collListItem);
                     ctx.ExecuteQuery();
 
-                    log.LogWarning("Lista cargada correctamente");
-                    log.LogWarning("Nº Documentos: " + list.ItemCount);
+                    log.LogInformation("Lista cargada correctamente");
+                    log.LogInformation("Nº Documentos: " + list.ItemCount);
                     
                     foreach (Microsoft.SharePoint.Client.ListItem item in collListItem)
                     {
@@ -95,8 +95,8 @@ namespace FCC.AF.CargaSociedades.Application
                             {
                                 ctx.Load(item.File);
                                 ctx.ExecuteQuery();
-                                log.LogWarning("Abrimos fichero excel de sociedades.");
-                                log.LogWarning("[" + item.File.ServerRelativeUrl + "]");
+                                log.LogInformation("Abrimos fichero excel de sociedades.");
+                                log.LogInformation("[" + item.File.ServerRelativeUrl + "]");
                                                             
                                 Microsoft.SharePoint.Client.File file = ctx.Web.GetFileByUrl(string.Format("{0}{1}", cfg._TenantUrl, item.File.ServerRelativeUrl));
                                 Microsoft.SharePoint.Client.ClientResult<Stream> mstream = file.OpenBinaryStream();
@@ -119,7 +119,7 @@ namespace FCC.AF.CargaSociedades.Application
 
                                 using (ClientContext ctx2 = CreateContext(cfg, certificate, siteurl))
                                 {
-                                    log.LogWarning("Contexto creado para el año");
+                                    log.LogInformation("Contexto creado para el año");
 
                                     CheckContentTypesStatutory(ctx2, DocumentTypesDT, "FCC Statutory", log);
                                     CheckContentTypesReporting(ctx2, DocumentTypesDT, "FCC Reporting", log);
@@ -172,7 +172,7 @@ namespace FCC.AF.CargaSociedades.Application
             {
                 if (statutorycols[i].Tipo == k_folder_type)
                 {
-                    log.LogWarning(statutorycols[i].Display + " [" + row[i].ToString() + "]");
+                    log.LogInformation(statutorycols[i].Display + " [" + row[i].ToString() + "]");
                     result = CreateFolder(ctx, row[i].ToString(), list, log);
                     break;
                 }
@@ -217,7 +217,7 @@ namespace FCC.AF.CargaSociedades.Application
             {
                 if (statutorycols[i].Tipo == k_subfolder_type)
                 {
-                    log.LogWarning(statutorycols[i].Display + " [" + foldername + "]" + " [" + row[i].ToString() + "]");
+                    log.LogInformation(statutorycols[i].Display + " [" + foldername + "]" + " [" + row[i].ToString() + "]");
                     result = CreateSubfolder(ctx, statutorycols, list, foldername, row[i].ToString(), log);
                     break;
                 }
@@ -446,7 +446,7 @@ namespace FCC.AF.CargaSociedades.Application
             }
             else
             {
-                log.LogWarning(String.Format("No se ha encontrado el grupo de SharePoint '{0}' para aplicar la seguridad.", groupname));
+                log.LogInformation(String.Format("No se ha encontrado el grupo de SharePoint '{0}' para aplicar la seguridad.", groupname));
             }
         }
 
@@ -462,7 +462,7 @@ namespace FCC.AF.CargaSociedades.Application
             }
             else
             {
-                log.LogWarning(String.Format("No se ha encontrado el grupo de SharePoint '{0}' para aplicar la seguridad.", groupname));
+                log.LogInformation(String.Format("No se ha encontrado el grupo de SharePoint '{0}' para aplicar la seguridad.", groupname));
             }
         }
         
@@ -506,17 +506,17 @@ namespace FCC.AF.CargaSociedades.Application
 
                     if (fieldsetting.Statutory == true)
                     {
-                        log.LogWarning("Añadimos columna de sitio '" + fieldsetting.Title + "' a Statutory.");
+                        log.LogInformation("Añadimos columna de sitio '" + fieldsetting.Title + "' a Statutory.");
                         LoadSiteColumn(ctx, newfield, k_contenttype_group_statutory, log);
                     }
                     if (fieldsetting.Reporting == true)
                     {
-                        log.LogWarning("Añadimos columna de sitio '" + fieldsetting.Title + "' a Reporting.");
+                        log.LogInformation("Añadimos columna de sitio '" + fieldsetting.Title + "' a Reporting.");
                         LoadSiteColumn(ctx, newfield, k_contenttype_group_reporting, log);
                     }
                     if (fieldsetting.Certificates == true)
                     {
-                        log.LogWarning("Añadimos columna de sitio '" + fieldsetting.Title + "' a Certificates.");
+                        log.LogInformation("Añadimos columna de sitio '" + fieldsetting.Title + "' a Certificates.");
                         LoadSiteColumn(ctx, newfield, k_contenttype_group_certificates, log);
                     }
                 }
@@ -530,7 +530,7 @@ namespace FCC.AF.CargaSociedades.Application
             ctx.Load(ctypes);
             ctx.ExecuteQuery();
 
-            log.LogWarning("Revisando tipos de contenido de '" + groupname + "'");
+            log.LogInformation("Revisando tipos de contenido de '" + groupname + "'");
 
             foreach (DataRow row in DocumentTypesDT.Rows)
             {
@@ -566,7 +566,7 @@ namespace FCC.AF.CargaSociedades.Application
                             Microsoft.SharePoint.Client.Field newfield = fields.Where(x => x.Group == k_sitecolumn_group && x.InternalName == fieldsetting.Title).FirstOrDefault();
                             if (fieldsetting.Statutory == true)
                             {
-                                log.LogWarning("Añadimos columna de sitio '" + fieldsetting.Title + "' a '" + groupname + "'.");
+                                log.LogInformation("Añadimos columna de sitio '" + fieldsetting.Title + "' a '" + groupname + "'.");
                                 LoadSiteColumnToContentType(ctx, newfield, newctype, groupname, log);
                             }
                         }
@@ -599,7 +599,7 @@ namespace FCC.AF.CargaSociedades.Application
             ctx.Load(ctypes);
             ctx.ExecuteQuery();
 
-            log.LogWarning("Revisando tipos de contenido de '" + groupname + "'");
+            log.LogInformation("Revisando tipos de contenido de '" + groupname + "'");
 
             foreach (DataRow row in DocumentTypesDT.Rows)
             {
@@ -635,7 +635,7 @@ namespace FCC.AF.CargaSociedades.Application
                             Microsoft.SharePoint.Client.Field newfield = fields.Where(x => x.Group == k_sitecolumn_group && x.InternalName == fieldsetting.Title).FirstOrDefault();
                             if (fieldsetting.Reporting == true)
                             {
-                                log.LogWarning("Añadimos columna de sitio '" + fieldsetting.Title + "' a '"+groupname+"'.");
+                                log.LogInformation("Añadimos columna de sitio '" + fieldsetting.Title + "' a '"+groupname+"'.");
                                 LoadSiteColumnToContentType(ctx, newfield, newctype, groupname, log);
                             }
                         }
@@ -669,7 +669,7 @@ namespace FCC.AF.CargaSociedades.Application
             ctx.Load(ctypes);
             ctx.ExecuteQuery();
 
-            log.LogWarning("Revisando tipos de contenido de '"+groupname+"'");
+            log.LogInformation("Revisando tipos de contenido de '"+groupname+"'");
 
             foreach (DataRow row in DocumentTypesDT.Rows)
             {
@@ -705,7 +705,7 @@ namespace FCC.AF.CargaSociedades.Application
                             Microsoft.SharePoint.Client.Field newfield = fields.Where(x => x.Group == k_sitecolumn_group && x.InternalName == fieldsetting.Title).FirstOrDefault();
                             if (fieldsetting.Certificates == true)
                             {
-                                log.LogWarning("Añadimos columna de sitio '" + fieldsetting.Title + "' a '" + groupname + "'.");
+                                log.LogInformation("Añadimos columna de sitio '" + fieldsetting.Title + "' a '" + groupname + "'.");
                                 LoadSiteColumnToContentType(ctx, newfield, newctype, groupname, log);
                             }
                         }
@@ -793,8 +793,8 @@ namespace FCC.AF.CargaSociedades.Application
 
                     log.LogInformation("Carpetas creadas.");
 
-                    log.LogWarning(folderurl);
-                    log.LogWarning(subfolderurl);
+                    log.LogInformation(folderurl);
+                    log.LogInformation(subfolderurl);
 
                     Folder folder = ctx.Web.GetFolderByServerRelativeUrl(folderurl);
                     Folder subfolder = ctx.Web.GetFolderByServerRelativeUrl(subfolderurl);
@@ -809,7 +809,7 @@ namespace FCC.AF.CargaSociedades.Application
 
                     SetSecurityFolders(cfg, groupname, list, folder, subfolder, ownersgroup, membersgroup, log);
 
-                    log.LogWarning("Seguridad aplicada");
+                    log.LogInformation("Seguridad aplicada");
 
                     foreach (DataRow doctyperow in DocumentTypesDT.Rows)
                     {
@@ -845,12 +845,12 @@ namespace FCC.AF.CargaSociedades.Application
                             // Comprobamos si el content type es de solo lectura. En ese caso, el grupo tendrá acceso de solo lectura a ese item
                             if (doctyperow[2].ToString() == "x")
                             {
-                                log.LogWarning("Acceso de reader al grupo de seguridad '" + groupname + "' (Individual)");
+                                log.LogInformation("Acceso de reader al grupo de seguridad '" + groupname + "' (Individual)");
                                 SetSecurityItem(cfg, groupname, item, ownersgroup, membersgroup, Microsoft.SharePoint.Client.RoleType.Reader, log);
                             }
                             else
                             {
-                                log.LogWarning("Acceso de contributor al grupo de seguridad '" + groupname + "' (Individual)");
+                                log.LogInformation("Acceso de contributor al grupo de seguridad '" + groupname + "' (Individual)");
                                 SetSecurityItem(cfg, groupname, item, ownersgroup, membersgroup, Microsoft.SharePoint.Client.RoleType.Contributor, log);
                             }
 
@@ -887,12 +887,12 @@ namespace FCC.AF.CargaSociedades.Application
                                 // Comprobamos si el content type es de solo lectura. En ese caso, el grupo tendrá acceso de solo lectura a ese item
                                 if (doctyperow[2].ToString() == "x")
                                 {
-                                    log.LogWarning("Acceso de reader al grupo de seguridad '" + groupname + "' (Consolidated)");
+                                    log.LogInformation("Acceso de reader al grupo de seguridad '" + groupname + "' (Consolidated)");
                                     SetSecurityItem(cfg, groupname, item, ownersgroup, membersgroup, Microsoft.SharePoint.Client.RoleType.Reader, log);
                                 }
                                 else
                                 {
-                                    log.LogWarning("Acceso de contributor al grupo de seguridad '" + groupname + "' (Consolidated)");
+                                    log.LogInformation("Acceso de contributor al grupo de seguridad '" + groupname + "' (Consolidated)");
                                     SetSecurityItem(cfg, groupname, item, ownersgroup, membersgroup, Microsoft.SharePoint.Client.RoleType.Contributor, log);
                                 }
                             }
@@ -945,8 +945,8 @@ namespace FCC.AF.CargaSociedades.Application
 
                     log.LogInformation("Carpetas creadas.");
 
-                    log.LogWarning(folderurl);
-                    log.LogWarning(subfolderurl);
+                    log.LogInformation(folderurl);
+                    log.LogInformation(subfolderurl);
 
                     Folder folder = ctx.Web.GetFolderByServerRelativeUrl(folderurl);
                     Folder subfolder = ctx.Web.GetFolderByServerRelativeUrl(subfolderurl);
@@ -962,7 +962,7 @@ namespace FCC.AF.CargaSociedades.Application
 
                     SetSecurityFolders(cfg, groupname, list, folder, subfolder, ownersgroup, membersgroup, log);
 
-                    log.LogWarning("Seguridad aplicada");
+                    log.LogInformation("Seguridad aplicada");
 
                     foreach (DataRow doctyperow in DocumentTypesDT.Rows)
                     {
@@ -989,12 +989,12 @@ namespace FCC.AF.CargaSociedades.Application
                             // Comprobamos si el content type es de solo lectura. En ese caso, el grupo tendrá acceso de solo lectura a ese item
                             if (doctyperow[2].ToString() == "x")
                             {
-                                log.LogWarning("Acceso de reader al grupo de seguridad '" + groupname + "' (Individual)");
+                                log.LogInformation("Acceso de reader al grupo de seguridad '" + groupname + "' (Individual)");
                                 SetSecurityItem(cfg, groupname, item, ownersgroup, membersgroup, Microsoft.SharePoint.Client.RoleType.Reader, log);
                             }
                             else
                             {
-                                log.LogWarning("Acceso de contributor al grupo de seguridad '" + groupname + "' (Individual)");
+                                log.LogInformation("Acceso de contributor al grupo de seguridad '" + groupname + "' (Individual)");
                                 SetSecurityItem(cfg, groupname, item, ownersgroup, membersgroup, Microsoft.SharePoint.Client.RoleType.Contributor, log);
                             }
 
@@ -1047,8 +1047,8 @@ namespace FCC.AF.CargaSociedades.Application
 
                     log.LogInformation("Carpetas creadas.");
 
-                    log.LogWarning(folderurl);
-                    log.LogWarning(subfolderurl);
+                    log.LogInformation(folderurl);
+                    log.LogInformation(subfolderurl);
 
                     Folder folder = ctx.Web.GetFolderByServerRelativeUrl(folderurl);
                     Folder subfolder = ctx.Web.GetFolderByServerRelativeUrl(subfolderurl);
@@ -1064,7 +1064,7 @@ namespace FCC.AF.CargaSociedades.Application
 
                     SetSecurityFolders(cfg, groupname, list, folder, subfolder, ownersgroup, membersgroup, log);
 
-                    log.LogWarning("Seguridad aplicada");
+                    log.LogInformation("Seguridad aplicada");
 
                     foreach (DataRow doctyperow in DocumentTypesDT.Rows)
                     {
@@ -1091,12 +1091,12 @@ namespace FCC.AF.CargaSociedades.Application
                             // Comprobamos si el content type es de solo lectura. En ese caso, el grupo tendrá acceso de solo lectura a ese item
                             if (doctyperow[2].ToString() == "x")
                             {
-                                log.LogWarning("Acceso de reader al grupo de seguridad '" + groupname + "' (Individual)");
+                                log.LogInformation("Acceso de reader al grupo de seguridad '" + groupname + "' (Individual)");
                                 SetSecurityItem(cfg, groupname, item, ownersgroup, membersgroup, Microsoft.SharePoint.Client.RoleType.Reader, log);
                             }
                             else
                             {
-                                log.LogWarning("Acceso de contributor al grupo de seguridad '" + groupname + "' (Individual)");
+                                log.LogInformation("Acceso de contributor al grupo de seguridad '" + groupname + "' (Individual)");
                                 SetSecurityItem(cfg, groupname, item, ownersgroup, membersgroup, Microsoft.SharePoint.Client.RoleType.Contributor, log);
                             }
 
